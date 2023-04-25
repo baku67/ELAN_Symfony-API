@@ -28,9 +28,9 @@
 
 
     {% block javascript %}
-        <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.js') }}"></script>
 
         <script>
+
             window.addEventListener("DOMContentLoaded", (event) => {
 
                 // Barre de recherche et liste déroulante
@@ -41,68 +41,68 @@
                 const gameText = document.querySelector('#gameText');
                 const gamePlayers = document.querySelector('#gamePlayers');
                 const gameMinutes = document.querySelector('#gameMinutes');
-            })
+            
 
-
-            // à la sortie de l'input de recherche
-            const search = document.querySelector('#search');
-            search.addEventListener('focusout', (e) => {
-                // vider la liste déroulante
-                select.innerText = null;
-                e.preventDefault();
-                // valeur saisie dans l'input
-                const searchValue = search.value;
-                // URL à fetch (HomeController)
-                const url = '/games';
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/x-www-form-urlencoded',
-                        'Accept': '*/*'
-                    },
-                    // paramètre de la route du controller (searchValue)
-                    body: new URLSearchParams({
-                        'searchValue': searchValue
+                // à la sortie de l'input de recherche
+                search.addEventListener('focusout', (e) => {
+                    // vider la liste déroulante
+                    selectGames.innerText = null;
+                    e.preventDefault();
+                    // valeur saisie dans l'input
+                    const searchValue = search.value;
+                    console.log(searchValue);
+                    // URL à fetch (HomeController)
+                    const url = '/games';
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': '*/*'
+                        },
+                        // paramètre de la route du controller (searchValue)
+                        body: new URLSearchParams({
+                            'searchValue': searchValue
+                        })
+                    })
+                    // création des options du select
+                    .then(async (response) => {
+                        const rep = await response.json();
+                        // bouclier sur les résultats de l'API
+                        for (r in rep["games"]) {
+                            let option = document.createElement('option');
+                            option.innerText = rep["games"][r]["name"] + " (" + rep["games"][r]["year_published"] + ")";
+                            option.value = rep["games"][r]["id"];
+                            selectGames.append(option);
+                        }
+                        console.log(rep["games"]);
                     })
                 })
-                // création des options du select
-                .then(async (response) => {
-                    const rep = await response.json();
-                    // bouclier sur les résultats de l'API
-                    for (r in rep["games"]) {
-                        let option = document.createElement('options');
-                        option.innerText = rep["games"][r]["name"] + " (" + rep["games"][r]["year_published"] + ")";
-                        option.value = rep["games"][r]["id"];
-                        selectGames.append(option);
-                    }
-                    console.log(rep["games"]);
-                })
-            })
 
-            // Chargement des détails du jeu séléctionner dans le select
-            const select = document.querySelector('#games');
-            select.addEventListener('change', (e) => {
-                e.preventDefault();
-                const gameId = select.selectedOptions[0].value;
-                const urlGame = '/game';
-                fetch(urlGame, {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/x-www-form-urlencoded',
-                        'Accept': '*/*'
-                    },
-                    body: new URLSearchParams({
-                        'gameId': gameId
+                // Chargement des détails du jeu séléctionner dans le select
+                selectGames.addEventListener('change', (e) => {
+                    e.preventDefault();
+                    const gameId = selectGames.selectedOptions[0].value;
+                    const urlGame = '/game';
+                    fetch(urlGame, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': '*/*'
+                        },
+                        body: new URLSearchParams({
+                            'gameId': gameId
+                        })
+                    })
+                    .then(async (response) => {
+                        const rep = await response.json();
+                        gameImg.src = rep["games"][0]["image_url"] ? rep["games"][0]["image_url"] : '../img/image.svg';
+                        gameText.innerHTML = rep["games"][0]["description"];
+                        gameTitle.innerHTML = rep["games"][0]["name"];
+                        gamePlayers.innerHTML = "<i class='fa-solid fa-users-line'></i> From " + rep["games"][0]["min_players"] + " to " + rep["games"][0]["max_players"] + " players";
+                        gameMinutes.innerHTML = "<i class='fa-regular fa-clock'></li> " + rep["games"][0]["playtime"] + " min";
                     })
                 })
-                .then(async (response) => {
-                    const rep = await response.json();
-                    gameImg.src = rep["games"][0]["image_url"] ? rep["games"][0]["image_url"] : '../img/image.svg';
-                    gameText.innerHTML = rep["games"][0]["description"];
-                    gameTitle.innerHTML = rep["games"][0]["name"];
-                    gamePlayers.innerHTML = "<i class='fa-solid fa-users-line'></i> From " + rep["games"][0]["min_players"] + " to " + rep["games"][0]["max_players"] + " players";
-                    gameMinutes.innerHTML = "<i class='fa-regular fa-clock'></li> " + rep["games"][0]["playtime"] + " min";
-                })
+
             })
 
         </script>
