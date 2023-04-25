@@ -82,6 +82,7 @@
                 selectGames.addEventListener('change', (e) => {
                     e.preventDefault();
                     const gameId = selectGames.selectedOptions[0].value;
+                    console.log(gameId);
                     const urlGame = '/game';
                     fetch(urlGame, {
                         method: 'POST',

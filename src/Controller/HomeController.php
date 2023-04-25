@@ -22,7 +22,7 @@ class HomeController extends AbstractController
     }
 
     /**
-    * @Route('/game', name='app_game', methods={'POST'})
+    * @Route("/game", name="app_game", methods={"POST"})
     */
     public function displayGame(BGAHttpClient $bga, Request $request) {
         $gameId = $request->request->get('gameId');
